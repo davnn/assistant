@@ -1,0 +1,159 @@
+{
+    "name": "assistant-gpt3",
+    "displayName": "🚀 assistant based on GPT-3",
+    "description": "Your personal (re-) writing assistant based on GPT-3.",
+    "version": "0.1.0",
+    "license": "MIT",
+    "icon": "assets/icon.png",
+    "publisher": "davnn",
+    "pricing": "Free",
+    "homepage": "https://github.com/davnn/assistant",
+    "author": {
+        "name": "David Muhr",
+        "email": "muhrdavid+github@gmail.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/davnn/assistant"
+    },
+    "engines": {
+        "vscode": "^1.72.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "keywords": [
+        "GPT-3",
+        "OpenAI",
+        "rewriting",
+        "completion",
+        "editing"
+    ],
+    "activationEvents": [
+        "onCommand:assistant.complete",
+        "onCommand:assistant.edit"
+    ],
+    "main": "./out/extension.js",
+    "contributes": {
+        "commands": [
+            {
+                "command": "assistant.complete",
+                "title": "Complete selected text or current line with GPT-3"
+            },
+            {
+                "command": "assistant.edit",
+                "title": "Edit selected text with GPT-3"
+            }
+        ],
+        "keybindings": [
+            {
+                "key": "ctrl+cmd+j",
+                "command": "assistant.complete"
+            },
+            {
+                "key": "ctrl+cmd+g",
+                "command": "assistant.edit"
+            }
+        ],
+        "configuration": {
+            "title": "assistant",
+            "properties": {
+                "assistant.replace": {
+                    "description": "Replace the input selection for edit queries.",
+                    "type": "boolean",
+                    "default": true
+                },
+                "assistant.gpt3.apiKey": {
+                    "description": "API key from Open AI, get yours from https://beta.openai.com/account/api-keys",
+                    "type": "string",
+                    "default": ""
+                },
+                "assistant.gpt3.completions.model": {
+                    "description": "GPT-3 model used for completion requests.",
+                    "type": "string",
+                    "default": "text-davinci-002"
+                },
+                "assistant.gpt3.completions.maxTokens": {
+                    "description": "The maximum number of tokens to generate in the completion.",
+                    "type": "number",
+                    "default": 256
+                },
+                "assistant.gpt3.completions.temperature": {
+                    "description": "Sampling temperature to use. Higher values means the model will take more risks. Try 0.9 for creative applications, and 0 (argmax sampling) for ones with a well-defined answer.",
+                    "type": "number",
+                    "default": 0
+                },
+                "assistant.gpt3.completions.topP": {
+                    "description": "An alternative to sampling with temperature, where the model considers the results of the tokens with `topP` probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.",
+                    "type": "number",
+                    "default": 1
+                },
+                "assistant.gpt3.completions.n": {
+                    "description": "How many completions to generate for each prompt.",
+                    "type": "number",
+                    "default": 1
+                },
+                "assistant.gpt3.completions.bestOf": {
+                    "description": "Generates `bestOf` number of completions server-side and returns the the one with the highest log probability per token.",
+                    "type": "number",
+                    "default": 1
+                },
+                "assistant.gpt3.edits.model": {
+                    "description": "GPT-3 model used for edit requests.",
+                    "type": "string",
+                    "default": "text-davinci-edit-001"
+                },
+                "assistant.gpt3.edits.instruction": {
+                    "description": "The instruction that tells the model how to edit the prompt.",
+                    "type": "string",
+                    "default": "Rewrite in own words"
+                },
+                "assistant.gpt3.edits.n": {
+                    "description": "How many completions to generate for each prompt.",
+                    "type": "number",
+                    "default": 1
+                },
+                "assistant.gpt3.edits.temperature": {
+                    "description": "Sampling temperature to use. Higher values means the model will take more risks. Try 0.9 for creative applications, and 0 (argmax sampling) for ones with a well-defined answer.",
+                    "type": "number",
+                    "default": 0
+                },
+                "assistant.gpt3.edits.topP": {
+                    "description": "An alternative to sampling with temperature, where the model considers the results of the tokens with `topP` probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.",
+                    "type": "number",
+                    "default": 1
+                }
+            }
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "yarn run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "pretest": "yarn run compile && yarn run lint",
+        "lint": "eslint src --ext ts",
+        "test": "node ./out/test/runTest.js",
+        "format": "prettier --write ./src --ignore-unknown",
+        "package": "vsce package",
+        "publish": "vsce publish"
+    },
+    "devDependencies": {
+        "@types/glob": "^8.0.0",
+        "@types/mocha": "^10.0.0",
+        "@types/node": "18.x",
+        "@types/vscode": "^1.72.0",
+        "@typescript-eslint/eslint-plugin": "^5.40.1",
+        "@typescript-eslint/parser": "^5.40.1",
+        "@vscode/test-electron": "^2.2.0",
+        "eslint": "^8.26.0",
+        "glob": "^8.0.3",
+        "mocha": "^10.1.0",
+        "typescript": "^4.8.4",
+        "vsce": "^2.13.0"
+    },
+    "dependencies": {
+        "openai": "^3.0.1",
+        "purify-ts": "^1.3.0",
+        "tslog": "^3.3.4"
+    }
+}
