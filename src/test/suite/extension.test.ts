@@ -6,9 +6,9 @@ import * as vscode from "vscode";
 // import * as myExtension from '../../extension';
 
 suite("Extension Test Suite", () => {
-	vscode.window.showInformationMessage("Start all tests.");
+    vscode.window.showInformationMessage("Start all tests.");
 
-	test("Sample test", () => {
-		assert.strictEqual(true, true);
-	});
+    test("Sample test", () => {
+        assert.strictEqual(true, true);
+    });
 });

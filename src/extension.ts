@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
-import {activeCompletions, complete} from "./complete";
-import {config, logger} from "./utils";
-import {edit} from "./edit";
+import { activeCompletions, complete } from "./complete";
+import { config, logger } from "./utils";
+import { edit } from "./edit";
 
 export async function activate(context: vscode.ExtensionContext) {
     logger.debug("Activating extension");
@@ -18,13 +18,13 @@ export async function activate(context: vscode.ExtensionContext) {
 
     // Provide completions for all kinds of documents
     logger.debug("Registering completion providers");
-    languages.forEach(language => {
+    languages.forEach((language) => {
         vscode.languages.registerCompletionItemProvider(language, {
             provideCompletionItems: () => {
                 logger.debug("Completion items requested for language:", language);
                 logger.debug("Completions", activeCompletions);
                 return activeCompletions;
-            }
+            },
         });
     });
 
