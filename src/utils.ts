@@ -1,13 +1,12 @@
 import * as vscode from "vscode";
 import { Maybe } from "purify-ts";
-import { Configuration, OpenAIApi } from "openai";
+import { Configuration, CreateEditResponse, CreateCompletionResponse, OpenAIApi } from "openai";
 import { Logger } from "tslog";
 
 const logger: Logger = new Logger({ name: "assistant", displayFilePath: "hidden" });
 const getConfig = <T = string>(key: string) => vscode.workspace.getConfiguration("assistant").get(key) as T;
 
 interface Config {
-    replace: boolean;
     gpt3: Gpt3;
 }
 
@@ -35,7 +34,6 @@ interface Edits {
 }
 
 const config: Config = {
-    replace: getConfig("replace"),
     gpt3: {
         apiKey: Maybe.fromFalsy(getConfig("gpt3.apiKey")),
         completions: {
@@ -89,5 +87,28 @@ const createAPI = () =>
             }),
         }),
     );
+const extractResponse = (responseData: CreateCompletionResponse | CreateEditResponse): string => {
+    const textResult = Maybe.fromFalsy(responseData.choices[0].text);
+    return textResult.orDefaultLazy(() => {
+        vscode.window.showWarningMessage("Received empty result, try again with a different query.");
+        return "";
+    });
+};
+const warnUnsupportedN = (configValue: number): number => {
+    if (configValue !== 1) {
+        vscode.window.showWarningMessage("Currently, only one return value is supported, `n` is discarded.");
+    }
+    return 1;
+};
 
-export { logger, config, Errors, getEditor, getSelection, getSelectionOrCurrentLine, createAPI };
+export {
+    logger,
+    config,
+    Errors,
+    getEditor,
+    getSelection,
+    getSelectionOrCurrentLine,
+    createAPI,
+    extractResponse,
+    warnUnsupportedN,
+};

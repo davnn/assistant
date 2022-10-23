@@ -58,11 +58,6 @@
         "configuration": {
             "title": "assistant",
             "properties": {
-                "assistant.replace": {
-                    "description": "Replace the input selection for edit queries.",
-                    "type": "boolean",
-                    "default": true
-                },
                 "assistant.gpt3.apiKey": {
                     "description": "API key from Open AI, get yours from https://beta.openai.com/account/api-keys",
                     "type": "string",
