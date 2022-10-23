@@ -1,6 +1,6 @@
-import {config, createAPI, Errors, getEditor, getSelectionOrCurrentLine, logger} from "./utils";
+import { config, createAPI, Errors, getEditor, getSelectionOrCurrentLine, logger } from "./utils";
 import * as vscode from "vscode";
-import {CompletionItem, CompletionItemKind, TextEditor} from "vscode";
+import { CompletionItem, CompletionItemKind, TextEditor } from "vscode";
 
 let activeCompletions: CompletionItem[] = [];
 
@@ -11,9 +11,10 @@ async function complete(): Promise<void> {
         const editor: TextEditor = getEditor();
         const selection: string = getSelectionOrCurrentLine(editor).trim();
         logger.debug("Selection determined:", selection);
+        vscode.window.showInformationMessage(`Fetching completion for "${selection}"`);
         const result = await fetchCompletion(selection);
         logger.debug("Completion determined:", result);
-        result.forEach(item => activeCompletions.push(createCompletionItem(item)));
+        result.forEach((item) => activeCompletions.push(createCompletionItem(item)));
         logger.debug("Added completion to completion items.");
         vscode.commands.executeCommand("editor.action.triggerSuggest");
     } catch (error: any) {
@@ -45,14 +46,11 @@ async function fetchCompletion(prompt: string): Promise<string[]> {
             prompt: prompt,
         });
         logger.debug("Received completion response:", response.data.choices);
-        return response.data.choices.map(choice => choice.text ? choice.text : "");
+        return response.data.choices.map((choice) => (choice.text ? choice.text : ""));
     } catch (error) {
         logger.error(`Completion request failed with ${error}`);
         throw new Error(Errors.failedGPTApiRequest);
     }
 }
 
-export {
-    complete,
-    activeCompletions
-};
+export { complete, activeCompletions };

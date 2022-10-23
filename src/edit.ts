@@ -1,29 +1,29 @@
-import {config, createAPI, Errors, getEditor, getSelection, logger} from "./utils";
+import { config, createAPI, Errors, getEditor, getSelection, logger } from "./utils";
 import * as vscode from "vscode";
-import {TextEditor} from "vscode";
+import { TextEditor } from "vscode";
 
 async function edit(): Promise<void> {
     try {
         logger.debug("Starting edit");
         const editor: TextEditor = getEditor();
         const selection = getSelection(editor);
-        const instruction = await vscode.window.showInputBox(
-            {
-                title: "Provide instructions how GPT-3 should edit your text",
-                placeHolder: config.gpt3.edits.instruction,
-                prompt: "If no instruction is provided, the configured default instruction is used."
-            });
+        const instruction = await vscode.window.showInputBox({
+            title: "Provide instructions how GPT-3 should edit your text",
+            placeHolder: config.gpt3.edits.instruction,
+            prompt: "If no instruction is provided, the configured default instruction is used.",
+        });
         logger.debug("Selection determined:", selection);
+        vscode.window.showInformationMessage(`Fetching edit for "${selection}"`);
         const result = await fetchEdit(instruction, selection);
         logger.debug("Edit determined:", result);
-        editor.edit(text => {
+        editor.edit((text) => {
             if (config.replace) {
                 text.replace(editor.selection, result);
             } else {
-                text.insert(new vscode.Position(Math.max(
-                    editor.selection.active.line,
-                    editor.selection.anchor.line
-                ) + 1, 0), result);
+                text.insert(
+                    new vscode.Position(Math.max(editor.selection.active.line, editor.selection.anchor.line) + 1, 0),
+                    result,
+                );
             }
         });
     } catch (error: any) {
@@ -54,6 +54,4 @@ async function fetchEdit(instruction: string | undefined, prompt: string): Promi
     }
 }
 
-export {
-    edit
-};
+export { edit };
