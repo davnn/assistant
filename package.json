@@ -2,7 +2,7 @@
     "name": "assistant-gpt3",
     "displayName": "🚀 assistant based on GPT-3",
     "description": "Your personal (re-) writing assistant based on GPT-3.",
-    "version": "0.1.1",
+    "version": "0.2.0",
     "license": "MIT",
     "icon": "assets/icon.png",
     "publisher": "davnn",
