@@ -1,12 +1,18 @@
-import { config, createAPI, Errors, getEditor, getSelectionOrCurrentLine, logger } from "./utils";
+import {
+    config,
+    createAPI,
+    Errors,
+    extractResponse,
+    getEditor,
+    getSelectionOrCurrentLine,
+    logger,
+    warnUnsupportedN,
+} from "./utils";
 import * as vscode from "vscode";
-import { CompletionItem, CompletionItemKind, TextEditor } from "vscode";
-
-let activeCompletions: CompletionItem[] = [];
+import { TextEditor } from "vscode";
 
 async function complete(): Promise<void> {
     try {
-        activeCompletions = [];
         logger.debug("Starting completion");
         const editor: TextEditor = getEditor();
         const selection: string = getSelectionOrCurrentLine(editor).trim();
@@ -14,22 +20,18 @@ async function complete(): Promise<void> {
         vscode.window.showInformationMessage(`Fetching completion for "${selection}"`);
         const result = await fetchCompletion(selection);
         logger.debug("Completion determined:", result);
-        result.forEach((item) => activeCompletions.push(createCompletionItem(item)));
-        logger.debug("Added completion to completion items.");
-        vscode.commands.executeCommand("editor.action.triggerSuggest");
+        editor.edit((text) =>
+            text.insert(
+                new vscode.Position(Math.max(editor.selection.active.line, editor.selection.anchor.line) + 1, 0),
+                result,
+            ),
+        );
     } catch (error: any) {
         vscode.window.showErrorMessage(error.message);
     }
 }
 
-function createCompletionItem(item: string): CompletionItem {
-    const itemTrimmed = item.trim();
-    const completionItem = new CompletionItem(itemTrimmed, CompletionItemKind.Text);
-    completionItem.documentation = new vscode.MarkdownString(itemTrimmed);
-    return completionItem;
-}
-
-async function fetchCompletion(prompt: string): Promise<string[]> {
+async function fetchCompletion(prompt: string): Promise<string> {
     const openAI = createAPI();
     try {
         logger.debug("Sending completion request.");
@@ -40,17 +42,17 @@ async function fetchCompletion(prompt: string): Promise<string[]> {
             temperature: config.gpt3.completions.temperature,
             // eslint-disable-next-line @typescript-eslint/naming-convention
             top_p: config.gpt3.completions.topP,
-            n: config.gpt3.completions.n,
+            n: warnUnsupportedN(config.gpt3.completions.n),
             // eslint-disable-next-line @typescript-eslint/naming-convention
             best_of: config.gpt3.completions.bestOf,
             prompt: prompt,
         });
         logger.debug("Received completion response:", response.data.choices);
-        return response.data.choices.map((choice) => (choice.text ? choice.text : ""));
+        return extractResponse(response.data);
     } catch (error) {
         logger.error(`Completion request failed with ${error}`);
         throw new Error(Errors.failedGPTApiRequest);
     }
 }
 
-export { complete, activeCompletions };
+export { complete };

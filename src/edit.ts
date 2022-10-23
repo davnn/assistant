@@ -1,4 +1,4 @@
-import { config, createAPI, Errors, getEditor, getSelection, logger } from "./utils";
+import { config, createAPI, Errors, extractResponse, getEditor, getSelection, logger, warnUnsupportedN } from "./utils";
 import * as vscode from "vscode";
 import { TextEditor } from "vscode";
 
@@ -16,16 +16,7 @@ async function edit(): Promise<void> {
         vscode.window.showInformationMessage(`Fetching edit for "${selection}"`);
         const result = await fetchEdit(instruction, selection);
         logger.debug("Edit determined:", result);
-        editor.edit((text) => {
-            if (config.replace) {
-                text.replace(editor.selection, result);
-            } else {
-                text.insert(
-                    new vscode.Position(Math.max(editor.selection.active.line, editor.selection.anchor.line) + 1, 0),
-                    result,
-                );
-            }
-        });
+        editor.edit((text) => text.replace(editor.selection, result));
     } catch (error: any) {
         vscode.window.showErrorMessage(error.message);
     }
@@ -42,12 +33,11 @@ async function fetchEdit(instruction: string | undefined, prompt: string): Promi
             temperature: config.gpt3.edits.temperature,
             // eslint-disable-next-line @typescript-eslint/naming-convention
             top_p: config.gpt3.edits.topP,
-            n: 1, // Currently, only one return value is supported and config.gpt3.edits.n is ignored
+            n: warnUnsupportedN(config.gpt3.edits.n),
             input: prompt,
         });
         logger.debug("Received edit response:", response.data);
-        const result = response.data.choices[0].text;
-        return result ? result : "";
+        return extractResponse(response.data);
     } catch (error: any) {
         logger.error(`Completion request failed with ${error}`);
         throw new Error(Errors.failedGPTApiRequest);
