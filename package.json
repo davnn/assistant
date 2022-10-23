@@ -141,8 +141,7 @@
         "lint": "eslint src --ext ts",
         "test": "node ./out/test/runTest.js",
         "format": "eslint --fix && prettier --write ./src --ignore-unknown",
-        "package": "vsce package",
-        "publish": "vsce publish"
+        "package": "vsce package"
     },
     "devDependencies": {
         "@types/glob": "^8.0.0",
